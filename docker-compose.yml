@@ -1,0 +1,35 @@
+services:
+
+  gnb:
+    # Use image from Docker Hub (default)
+    image: mhrahman7105/ocudu-zmq-srsue-ready
+
+    # Uncomment the following line to use a locally built image instead
+    # image: ocudu-zmq-srsue-ready:latest
+    container_name: ocudu-gnb
+    privileged: true
+    network_mode: host
+    volumes:
+      - ./configs:/configs
+    command: /scripts/start_gnb.sh
+
+  srsue:
+    # Use image from Docker Hub (default)
+    image: mhrahman7105/ocudu-zmq-srsue-ready
+
+    # Uncomment the following line to use a locally built image instead
+    # image: ocudu-zmq-srsue-ready:latest
+    container_name: srsue-zmq
+    privileged: true
+    network_mode: host
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    volumes:
+      - ./configs:/configs
+    depends_on:
+      - gnb
+    command: >
+      bash -c "sleep 10 && /scripts/start_ue.sh"
